@@ -12,9 +12,9 @@ var fp_path = '/tmp/lista.txt'
 //
 function getFilterSpan(){
 	var bercario_regex = new RegExp('Bercario*')
-	var estagio2_regex = new RegExp('Estagio II*');
+	var estagio2_regex = new RegExp('\Estagio_II\+');
 	for ( var i = 0 ; i < fb_spans.length ; i++){
-		if ( ( fb_spans[i].textContent != "" ) && ( url_regext.test(fb_spans[i].textContent ) ) && ! bercario_regex.test(fb_spans[i].textContent) && ! estagio2 ) {
+		if ( ( fb_spans[i].textContent != "" ) && ( url_regext.test(fb_spans[i].textContent ) ) && ! bercario_regex.test(fb_spans[i].textContent) && ! estagio2_regex.test(fb_spans[i].textContent)) {
 			filter_span.push(fb_spans[i].textContent + '\n\n')
 			//filter_span_str+= fb_spans[i].textContent + '\n\n'
 
@@ -64,8 +64,8 @@ function getListPDFs(){
 
 function main(){
 	getFilterSpan()
-	my_v = getListVideos()
-	my_pdfs = getListPDFs()
+	my_v =  Array.from( new Set (getListVideos() ))
+	my_pdfs = Array.from ( new Set(getListPDFs()))
 	var obj = [ my_v,my_pdfs]
 	copy(obj)
 }
