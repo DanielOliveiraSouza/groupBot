@@ -42,12 +42,13 @@ function getListVideos(){
 function getListPDFs(){
 	var pdfs_list = [];
 	var pdf_regex = new RegExp('\.pdf');
+	var estagio_regex = new RegExp("Estagio*");
 
 	for ( var i = 0; i < filter_span.length;i++){
 		var split_filter = filter_span[i].split(' ')
 		
 		for ( var j = 0; j < split_filter.length;j++){
-			if ( pdf_regex.test(split_filter[j]) ){ //verifica se  split_filter[j] tem a expressão regular do \.pdf
+			if ( pdf_regex.test(split_filter[j]) && ( estagio_regex.test(split_filter[j])  == true ) ){ //verifica se  split_filter[j] tem a expressão regular do \.pdf
 				pdfs_list.push(split_filter[j])
 			}
 		}
