@@ -2,11 +2,14 @@
 
 
 //const MaterialAula = require('MaterialAula')
-const fs = require('fs');
 
+const os = require('os')
+const fs = require('fs');
+const path = require('path');
 
 const ytdl = require ('ytdl-core');
 var FP = 'video-0.mp4';
+var VIDEOS_DIR = path.resolve(os.homedir(),'AULAS_ANA');
 
 var videos_list = [
     "https://youtu.be/zPTgG66XHac",
@@ -133,43 +136,25 @@ var videos_list = [
 
 
 
-
-function downloadAllVideos(){
-	const options = []
-	var url = videos_list[0]
-	
-	for ( var i=0 ;i < videos_list.lenght;i++) {
-		url = videos_list[i];
-
-		var FP='video-' + i.toString() + '.mp4'
-		
-		var video = youtubedl(url,options,
-			['--format=18'],
-			{cwd: __dirname});
-
-		video.on('info',function(info){
-			console.log('Download is started...')
-			console.log('size = ', info.size)
-			console.dir(info._filename)
-		});
-
-		video.pipe(fs.createWriteStream(FP))
-
-	}
-
-}
-
-
-
  async function downloadTitle(url,i){
 	const options = []
 	var title =  "" ;	
-	await ytdl.getInfo(url).then(data=>{
+	await ytdl.getBasicInfo(url).then(data=>{
 		title=data.videoDetails.title;
 		//console.log(data.videoDetails.title);
+
+		if ( i < 10 )
+			title ='video-0' + i.toString() +'-' + data.videoDetails.title;
+		else
+			title = 'video-'+i.toString() + '-' + data.videoDetails.title;
 	});
 
-	console.log('i ', i, title)
+
+	console.log(title)
+
+
+
+
 }
 
 //setTimeout(downloadTitle, 600000);
@@ -184,6 +169,8 @@ async function getAllTitles(){
 
 //downloadAllVideos()
 
-getAllTitles()
 
+
+getAllTitles()
+console.log(VIDEOS_DIR)
 	
