@@ -2,8 +2,10 @@
 
 
 //const MaterialAula = require('MaterialAula')
-const fs = require('fs')
-const youtubedl = require('youtube-dl')
+const fs = require('fs');
+
+
+const ytdl = require ('ytdl-core');
 var FP = 'video-0.mp4';
 
 var videos_list = [
@@ -18,7 +20,7 @@ var videos_list = [
     "https://youtu.be/2Dm3bhqWVqk",
     "https://youtu.be/nZyu8T98lwg",
     "https://youtu.be/3dTretffwGQ",
-    "https://www.youtube.com/watc",
+   // "https://www.youtube.com/watc",
     "https://youtu.be/vt6PraoNCiA",
     "https://www.youtube.com/watch?v=me9K2vUYtTc",
     "https://youtu.be/HcVHqp9rnHA",
@@ -159,32 +161,29 @@ function downloadAllVideos(){
 
 
 
-
-function downloadTitle(url){
+ async function downloadTitle(url,i){
 	const options = []
-	youtubedl.getInfo(url,options,async function(err,info){
-		if ( err ) throw err;
-		
-		console.log('title',info.title)
-		
-		});
+	var title =  "" ;	
+	await ytdl.getInfo(url).then(data=>{
+		title=data.videoDetails.title;
+		//console.log(data.videoDetails.title);
+	});
+
+	console.log('i ', i, title)
 }
-function getAllTitles(){
-	
-	
-	
+
+//setTimeout(downloadTitle, 600000);
+async function getAllTitles(){
+
 	for ( var i = 0 ;i < videos_list.length -1; i++) {
-		var url = videos_list[i];
-
-		console.log('url[',i,']','=',url);
-		downloadTitle(url)
-
-		
+		var url = videos_list[i]
+		downloadTitle(url,i)	
 	}
 }
 
 
 //downloadAllVideos()
+
 getAllTitles()
 
 	
