@@ -12,7 +12,7 @@ var fp_path = '/tmp/lista.txt'
 //
 function getFilterSpan(){
 	var bercario_regex = new RegExp('Bercario+|Berçário+|berçário+|BERÇÁRIO+')
-	var estagio2_regex = new RegExp('Estagio_II+|ESTÁGIO_II+|estágio_II+|estágio[\s]II+','i');
+	var estagio2_regex = new RegExp('Estagio_II+|ESTÁGIO_II+|estágio_II+|estágio[\s]II+|ESTÁGIO[\s]II+|ESTÁGIO II+|II+');
 	for ( var i = 0 ; i < fb_spans.length ; i++){
 		if ( ( fb_spans[i].textContent != "" ) && ( url_regext.test(fb_spans[i].textContent ) ) && ! bercario_regex.test(fb_spans[i].textContent) && ! estagio2_regex.test(fb_spans[i].textContent)) {
 			filter_span.push(fb_spans[i].textContent)
