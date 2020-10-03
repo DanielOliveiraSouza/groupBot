@@ -6,7 +6,7 @@
 const os = require('os')
 const fs = require('fs');
 const path = require('path');
-
+const emojiStrip = require('emoji-strip')
 const ytdl = require ('ytdl-core');
 var FP = 'video-0.mp4';
 var VIDEOS_DIR = path.resolve(os.homedir(),'AULAS_ANA');
@@ -133,36 +133,69 @@ var videos_list = [
   ]
 
 
+function replaceSpecialChars(str){
+	var count = 0;
+	ret = str
+	while( count < str.length ) {
+		ret = emojiStrip( ret).replace(',','').replace(' ','_').replace('/\//g','').replace('/\s/g','').replace('/\//g','')
+		.replace('"','').replace('.','').replace('/','').replace('?','').replace('!','').replace('(','').replace(')','')
+		.replace(':','').replace('|','').replace("#",'')
+		//console.log(title)
+		count++;
+	}
+	return ret
+}
 
+async function getVideo(url,title){
+	var path_video=path.resolve(VIDEOS_DIR,title)
+	//console.log(path_video)
+	if ( !fs.existsSync(VIDEOS_DIR) ){
 
+		fs.mkdir(VIDEOS_DIR, {recursive: false},(err) =>{
+			if ( err) throw err;
+		});
+	}
 
+	if ( ! fs.existsSync(path_video) ){
+		console.log('Getting', title,'by url:',url,'...' )
+
+		await ytdl(url).pipe(fs.createWriteStream(path_video))
+	}
+	
+
+}
  async function downloadTitle(url,i){
-	const options = []
+ 	const options = []
+ 	var count=0
 	var title =  "" ;	
+
 	await ytdl.getBasicInfo(url).then(data=>{
-		title=data.videoDetails.title;
 		//console.log(data.videoDetails.title);
 
 		if ( i < 10 )
-			title ='video-0' + i.toString() +'-' + data.videoDetails.title;
+			title ='video-0' + i.toString() + '-' + data.videoDetails.title.toString()
 		else
-			title = 'video-'+i.toString() + '-' + data.videoDetails.title;
+			title = 'video-' + i.toString() + '-' + data.videoDetails.title.toString();
 	});
-
-
-	console.log(title)
-
-
-
+	
+	title = replaceSpecialChars(title)+ '.mp4'
+	getVideo(url,title)
 
 }
 
 //setTimeout(downloadTitle, 600000);
 async function getAllTitles(){
 
-	for ( var i = 0 ;i < videos_list.length -1; i++) {
+	for ( var i = 0 ;i < videos_list.length; i++) {
 		var url = videos_list[i]
-		downloadTitle(url,i)	
+		if (url == "https://youtu.be/9wEq8X5hAhY")
+			continue;
+		
+		await downloadTitle(url,i)	
+		/*if ( i == 2 ){
+			console.log('saindo  do teste...')
+			break;
+		}*/
 	}
 }
 
@@ -170,7 +203,7 @@ async function getAllTitles(){
 //downloadAllVideos()
 
 
-
-getAllTitles()
-console.log(VIDEOS_DIR)
-	
+async function main(){
+	await getAllTitles()
+}
+main()
