@@ -8,7 +8,6 @@ const fs = require('fs');
 const path = require('path');
 const emojiStrip = require('emoji-strip')
 const ytdl = require ('ytdl-core');
-var FP = 'video-0.mp4';
 var VIDEOS_DIR = path.resolve(os.homedir(),'AULAS_ANA');
 
 var videos_list = [
@@ -23,7 +22,7 @@ var videos_list = [
     "https://youtu.be/2Dm3bhqWVqk",
     "https://youtu.be/nZyu8T98lwg",
     "https://youtu.be/3dTretffwGQ",
-   // "https://www.youtube.com/watc",
+    "https://www.youtube.com/watch?v=ba-wQKDiZIQ",
     "https://youtu.be/vt6PraoNCiA",
     "https://www.youtube.com/watch?v=me9K2vUYtTc",
     "https://youtu.be/HcVHqp9rnHA",
@@ -49,13 +48,6 @@ var videos_list = [
     "https://www.youtube.com/watch?v=D9-F8QDoOvQ",
     "https://youtu.be/dDGCbDrurTY",
     "https://youtu.be/HULog5uNlrw",
-    "https://youtu.be/W5lVeBzXduo",
-    "https://youtu.be/SyZu0ViRl_A",
-    "https://youtu.be/AHLSjQDcqsg",
-    "https://www.youtube.com/watch?v=ChrVW4ruOPQ",
-    "https://www.youtube.com/watch?time_continue=3&v=aiXj3-u_eWw&feature=emb_logo",
-    "https://www.youtube.com/watch?v=CZ6HP85KDNo",
-    "https://youtu.be/JHc8gl5uWy4",
     "https://youtu.be/Eiz15wJhT0o",
     "https://youtu.be/xwlxvdw9xuM",
     "https://youtu.be/UlN64kOl5jA",
@@ -67,20 +59,27 @@ var videos_list = [
     "https://youtu.be/2WlE917KCT8",
     "https://youtu.be/Far1euDx-ps",
     "https://youtu.be/Okz41Yrxag8",
+    "https://youtu.be/W5lVeBzXduo",
+    "https://youtu.be/SyZu0ViRl_A",
+    "https://youtu.be/AHLSjQDcqsg",
+    "https://www.youtube.com/watch?v=ChrVW4ruOPQ",
+    "https://www.youtube.com/watch?time_continue=3&v=aiXj3-u_eWw&feature=emb_logo",
+    "https://www.youtube.com/watch?v=CZ6HP85KDNo",
+    "https://youtu.be/JHc8gl5uWy4",
     "https://youtu.be/ggvjDEpL0eQ",
     "https://youtu.be/-W0gTyuE3t8",
     "https://youtu.be/6gErX5pNLbU",
     "https://youtu.be/CJ3no-nVWDU",
     "https://youtu.be/ngYzSmhqUD0",
+    "https://youtu.be/ap8pJpzQ0qU",
+    "https://www.youtube.com/watch?v=55wZEu7IlB8",
+    "https://youtu.be/PArIr5GtEvQ",
+    "https://youtu.be/Gh3awD5FVKk",
     "https://youtu.be/66ZZK64j3E4",
     "https://youtu.be/KAa0mrk4yMY",
     "https://youtu.be/CaTXgmHyMSk",
     "https://youtu.be/wbNEEQzKpLs",
     "https://youtu.be/x5Dm5FcvIOw",
-    "https://youtu.be/ap8pJpzQ0qU",
-    "https://www.youtube.com/watch?v=55wZEu7IlB8",
-    "https://youtu.be/PArIr5GtEvQ",
-    "https://youtu.be/Gh3awD5FVKk",
     "https://youtu.be/h0h3XTJmysM",
     "https://youtu.be/KlKtXxZiAFs",
     "https://youtu.be/SyqJjH8R9oM",
@@ -106,12 +105,7 @@ var videos_list = [
     "https://youtu.be/mlzVNVzd0c4",
     "https://youtu.be/PbnJRsUE6fo",
     "https://youtu.be/_d2xYgsJoZM",
-    "https://youtu.be/DIwylF8oGaw",
-    "https://youtu.be/_UdOh8gGruE",
-    "https://youtu.be/i6mH9c_I1-Q",
-    "https://youtu.be/nytgfz_NpyM",
-    "https://youtu.be/78xEaW5GJ0g",
-    "https://youtu.be/Md8aeK9HGbo"
+    "https://youtu.be/DIwylF8oGaw"
   ]
 
   var atividades_list = [
@@ -148,8 +142,9 @@ function replaceSpecialChars(str){
 
 async function getVideo(url,title){
 	var path_video=path.resolve(VIDEOS_DIR,title)
-	//console.log(path_video)
-	if ( !fs.existsSync(VIDEOS_DIR) ){
+	
+
+		if ( !fs.existsSync(VIDEOS_DIR) ){
 
 		fs.mkdir(VIDEOS_DIR, {recursive: false},(err) =>{
 			if ( err) throw err;
@@ -157,29 +152,57 @@ async function getVideo(url,title){
 	}
 
 	if ( ! fs.existsSync(path_video) ){
-		console.log('Getting', title,'by url:',url,'...' )
+		console.log('Getting: ',url,'...' )
+		
+		var flag_err = 0;
+		var file_error='';
+		try{
+			var video = await ytdl(url)
 
-		await ytdl(url).pipe(fs.createWriteStream(path_video))
+			await video.pipe(fs.createWriteStream(path_video))
+
+			await video.on('error',err=>{
+				console.log('error in url:',url,'file:',path_video)
+				try {
+						fs.unlinkSync(path_video)
+				}catch(err){
+					console.log('não foi possivel remover',path_video)
+				}
+			});
+
+			await video.on('end',()=>{
+				console.log('finish download video:',path_video, 'by url:',url,'\n\n')
+			})
+
+		}catch (err) {
+			console.log('erro desconhecido url:',url, 'arquivo',path_video);
+		}
+
 	}
-	
-
 }
- async function downloadTitle(url,i){
+
+
+async function downloadTitle(url,i){
  	const options = []
  	var count=0
 	var title =  "" ;	
 
-	await ytdl.getBasicInfo(url).then(data=>{
-		//console.log(data.videoDetails.title);
+	try {
+		await ytdl.getBasicInfo(url).then(data=>{
+			//console.log(data.videoDetails.title);
 
-		if ( i < 10 )
-			title ='video-0' + i.toString() + '-' + data.videoDetails.title.toString()
-		else
-			title = 'video-' + i.toString() + '-' + data.videoDetails.title.toString();
-	});
-	
-	title = replaceSpecialChars(title)+ '.mp4'
-	getVideo(url,title)
+			if ( i < 10 )
+				title ='video-0' + i.toString() + '-' + data.videoDetails.title.toString()
+			else
+				title = 'video-' + i.toString() + '-' + data.videoDetails.title.toString();
+		});
+		
+		title = replaceSpecialChars(title)+ '.mp4'
+		await getVideo(url,title)
+
+	}catch(err){
+		console.log('erro ao tentar obter o titulo do vídeo url:',url)
+	}
 
 }
 
@@ -188,9 +211,9 @@ async function getAllTitles(){
 
 	for ( var i = 0 ;i < videos_list.length; i++) {
 		var url = videos_list[i]
-		if (url == "https://youtu.be/9wEq8X5hAhY")
-			continue;
-		
+	//	if (url == "https://youtu.be/9wEq8X5hAhY" || (url == 'https://www.youtube.com/watch?v=D9-F8QDoOvQ'))
+	//		continue;
+
 		await downloadTitle(url,i)	
 		/*if ( i == 2 ){
 			console.log('saindo  do teste...')

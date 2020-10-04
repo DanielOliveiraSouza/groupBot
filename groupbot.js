@@ -7,14 +7,18 @@ var fb_spans = document.getElementsByTagName('span');
 var url_regext = new RegExp("https:\/\/[A-z0-9\.#]*");
 var filter_span = [];
 var fp_path = '/tmp/lista.txt'
+var obj = null;
 
 
 //
 function getFilterSpan(){
 	var bercario_regex = new RegExp('Bercario+|Berçário+|berçário+|BERÇÁRIO+')
+	var maternal_regex = new RegExp('MATERNAL+','i')
 	var estagio2_regex = new RegExp('Estagio_II+|ESTÁGIO_II+|estágio_II+|estágio[\s]II+|ESTÁGIO[\s]II+|ESTÁGIO II+|II+');
 	for ( var i = 0 ; i < fb_spans.length ; i++){
-		if ( ( fb_spans[i].textContent != "" ) && ( url_regext.test(fb_spans[i].textContent ) ) && ! bercario_regex.test(fb_spans[i].textContent) && ! estagio2_regex.test(fb_spans[i].textContent)) {
+		if ( ( fb_spans[i].textContent != "" ) && ( url_regext.test(fb_spans[i].textContent ) ) 
+			&& ! bercario_regex.test(fb_spans[i].textContent) && ! estagio2_regex.test(fb_spans[i].textContent) 
+			&& ! maternal_regex.test(fb_spans[i].textContent)){
 			filter_span.push(fb_spans[i].textContent)
 			//filter_span_str+= fb_spans[i].textContent + '\n\n'
 
@@ -78,4 +82,4 @@ function main(){
 	copy(obj)
 }
 
-main()
+main()	
