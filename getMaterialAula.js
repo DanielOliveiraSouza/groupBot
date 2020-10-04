@@ -1,13 +1,12 @@
 #!/usr/bin/node
 
-
-//const MaterialAula = require('MaterialAula')
-
 const os = require('os')
 const fs = require('fs');
 const path = require('path');
 const emojiStrip = require('emoji-strip')
 const ytdl = require ('ytdl-core');
+
+
 var VIDEOS_DIR = path.resolve(os.homedir(),'AULAS_ANA');
 
 var videos_list = [
@@ -126,7 +125,8 @@ var videos_list = [
     "Atividades_complementares_Estagio_I_0607_a_1007.pdf"
   ]
 
-
+//função para remover todos os caracteres não permitidos em nomes de arquivos
+//obs: essa função  foi criado,pois o node.js v12 não possui o metodo String.prototype.replaceAll (ECMA2021)
 function replaceSpecialChars(str){
 	var count = 0;
 	ret = str
@@ -140,57 +140,68 @@ function replaceSpecialChars(str){
 	return ret
 }
 
+/**
+	Get youtube video an save in VIDEOS_DIR
+	* @param {string} url
+	* @param {string} title
+*/
 async function getVideo(url,title){
 	var path_video=path.resolve(VIDEOS_DIR,title)
 	
 
-		if ( !fs.existsSync(VIDEOS_DIR) ){
+		if ( !fs.existsSync(VIDEOS_DIR) ){  //testa se o dietório VIDEOS_DIR não existe
 
-		fs.mkdir(VIDEOS_DIR, {recursive: false},(err) =>{
+		fs.mkdir(VIDEOS_DIR, {recursive: false},(err) =>{  //cria o diretório VIDEOS_DIR
 			if ( err) throw err;
 		});
 	}
 
-	if ( ! fs.existsSync(path_video) ){
-		console.log('Getting: ',url,'...' )
+	if ( ! fs.existsSync(path_video) ){ // verifica se o path_video existe
 		
-		var flag_err = 0;
-		var file_error='';
 		try{
-			var video = await ytdl(url)
+			var video = await ytdl(url) //baixa o stream de vídeo 
 
-			await video.pipe(fs.createWriteStream(path_video))
+			await video.pipe(fs.createWriteStream(path_video)) //escreve o stream de vídeo em arquivo
 
-			await video.on('error',err=>{
-				console.log('error in url:',url,'file:',path_video)
-				try {
-						fs.unlinkSync(path_video)
+			await video.on('error',err=>{ // trata erro de escrita do stream 
+				console.log('error in write read/write pipe in url:',url,'\n\n')
+				try{ 	//tenta remover arquivo  corrompido
+
+					fs.unlinkSync(path_video) 
 				}catch(err){
-					console.log('não foi possivel remover',path_video)
+					console.log('error in del the file',path_video,'\n\n')
 				}
 			});
 
 			await video.on('end',()=>{
-				console.log('finish download video:',path_video, 'by url:',url,'\n\n')
+				//console.log('finish download video:',path_video)
+				;
 			})
 
 		}catch (err) {
-			console.log('erro desconhecido url:',url, 'arquivo',path_video);
+			console.log('error on read stream in url:',url,'\n\n');
 		}
 
 	}
 }
 
 
+
+/**
+	Try Prepare a download of youtube video
+	*@param {string} url - URL od video
+	*@param {integer} i  - i  number 
+*/
+
 async function downloadTitle(url,i){
  	const options = []
  	var count=0
-	var title =  "" ;	
+	var title =  "" ;
 
-	try {
+	console.log('Trying download: ',url,'...' )
+	try { //tenta obter informações sobre o vídeo
+
 		await ytdl.getBasicInfo(url).then(data=>{
-			//console.log(data.videoDetails.title);
-
 			if ( i < 10 )
 				title ='video-0' + i.toString() + '-' + data.videoDetails.title.toString()
 			else
@@ -198,35 +209,28 @@ async function downloadTitle(url,i){
 		});
 		
 		title = replaceSpecialChars(title)+ '.mp4'
+		
 		await getVideo(url,title)
 
 	}catch(err){
-		console.log('erro ao tentar obter o titulo do vídeo url:',url)
+		console.log('error in get video info:',url,'\n\n')
 	}
 
 }
 
-//setTimeout(downloadTitle, 600000);
+//função para baixar todos os vídeos 
 async function getAllTitles(){
 
 	for ( var i = 0 ;i < videos_list.length; i++) {
 		var url = videos_list[i]
-	//	if (url == "https://youtu.be/9wEq8X5hAhY" || (url == 'https://www.youtube.com/watch?v=D9-F8QDoOvQ'))
-	//		continue;
-
-		await downloadTitle(url,i)	
-		/*if ( i == 2 ){
-			console.log('saindo  do teste...')
-			break;
-		}*/
+		await downloadTitle(url,i)
 	}
 }
 
 
-//downloadAllVideos()
-
-
-async function main(){
+//função princiapal
+async function main (){
 	await getAllTitles()
 }
+
 main()
