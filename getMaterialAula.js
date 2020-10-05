@@ -133,7 +133,7 @@ function replaceSpecialChars(str){
 	while( count < str.length ) {
 		ret = emojiStrip( ret).replace(',','').replace(' ','_').replace('/\//g','').replace('/\s/g','').replace('/\//g','')
 		.replace('"','').replace('.','').replace('/','').replace('?','').replace('!','').replace('(','').replace(')','')
-		.replace(':','').replace('|','').replace("#",'')
+		.replace(':','').replace('|','').replace("#",'').replace('__','').replace('--','').replace('_-_','')
 		//console.log(title)
 		count++;
 	}

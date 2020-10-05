@@ -3,11 +3,14 @@
 	Description: This bot a
 
 */
+
+
 var fb_spans = document.getElementsByTagName('span');
 var url_regext = new RegExp("https:\/\/[A-z0-9\.#]*");
 var filter_span = [];
 var fp_path = '/tmp/lista.txt'
 var obj = null;
+
 
 
 //
@@ -19,7 +22,14 @@ function getFilterSpan(){
 		if ( ( fb_spans[i].textContent != "" ) && ( url_regext.test(fb_spans[i].textContent ) ) 
 			&& ! bercario_regex.test(fb_spans[i].textContent) && ! estagio2_regex.test(fb_spans[i].textContent) 
 			&& ! maternal_regex.test(fb_spans[i].textContent)){
-			filter_span.push(fb_spans[i].textContent)
+			filter_span.push(
+				{ 
+					id: i,
+					postContent: fb_spans[i].textContent,
+					semana:''
+				}
+			)
+			//filter_span.push(fb_spans[i].textContent)
 			//filter_span_str+= fb_spans[i].textContent + '\n\n'
 
 		}
@@ -31,7 +41,7 @@ function getListVideos(){
 	var video_list_downloader = []
 
 	for ( var i = 0; i < filter_span.length;i++){
-		var split_filter = filter_span[i].split(' ')
+		var split_filter = filter_span[i].postContent.split(' ')
 		
 		for ( var j = 0 ; j < split_filter.length;j++){
 			if  ( url_regext.test(split_filter[j] ) && new RegExp('https:\/\/[www\.]*you*').test(split_filter[j])){ //verifica se split_filter[j] é uma url
@@ -59,7 +69,7 @@ function getListPDFs(){
 	var estagio_regex = new RegExp("Estagio*");
 
 	for ( var i = 0; i < filter_span.length;i++){
-		var split_filter = filter_span[i].split(' ')
+		var split_filter = filter_span[i].postContent.split(' ')
 		
 		for ( var j = 0; j < split_filter.length;j++){
 			if ( pdf_regex.test(split_filter[j]) && ( estagio_regex.test(split_filter[j])  == true ) ){ //verifica se  split_filter[j] tem a expressão regular do \.pdf
@@ -78,7 +88,7 @@ function main(){
 	getFilterSpan()
 	my_v =    Array.from ( new Set (getListVideos() ))
 	my_pdfs = Array.from ( new Set(getListPDFs()))
-	var obj = [ my_v,my_pdfs]
+	obj = [ my_v,my_pdfs]
 	copy(obj)
 }
 
