@@ -26,7 +26,8 @@ function getFilterSpan(){
 				{ 
 					id: i,
 					postContent: fb_spans[i].textContent,
-					semana:''
+					semana:'',
+					urlPost:''
 				}
 			)
 			//filter_span.push(fb_spans[i].textContent)
@@ -35,6 +36,7 @@ function getFilterSpan(){
 		}
 	}
 }
+
 
 //retorna a lista de vídeos a ser baixado
 function getListVideos(){
@@ -84,8 +86,23 @@ function getListPDFs(){
 }
 
 
+function getUrlPost(){
+	for(i = 0; i < filter_span.length;i++){
+		var my_node = fb_spans[filter_span[i].id ]
+		var cont = 0;
+		while ( my_node != null && my_node.tagName != 'A'){
+ 		   my_node = my_node.parentElement
+    		cont++;
+		}
+		if ( my_node != null ){
+			filter_span[i].urlPost = my_node.getAttribute('href')
+		}
+	}
+}
+
 function main(){
 	getFilterSpan()
+	getUrlPost()
 	my_v =    Array.from ( new Set (getListVideos() ))
 	my_pdfs = Array.from ( new Set(getListPDFs()))
 	obj = [ my_v,my_pdfs]
@@ -93,3 +110,7 @@ function main(){
 }
 
 main()	
+
+
+
+getUrlPost()
