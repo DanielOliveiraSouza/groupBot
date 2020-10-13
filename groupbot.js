@@ -1,6 +1,6 @@
 	/*
 		Author: Daniel Oliveira Souza
-		Description: This bot a
+		Description: Retorna  posts do facebook que contém determinada expressão regular
 
 	*/
 
@@ -36,19 +36,9 @@
 		var video_list_downloader  = Array.from ( new Set (filter_span.map(function(post){
 			return post.postContent
 		}).reduce((posts,atualPost) => posts + atualPost).split(' ') ) ).filter(function(str){
-			return new RegExp('https:\/\/[www\.]*you*').test(str)
+			return new RegExp('https:\/\/*you*').test(str)
 		})
 
-		/*for ( var i = 0; i < filter_span.length;i++){
-			var split_filter = filter_span[i].postContent.split(' ')
-			
-			for ( var j = 0 ; j < split_filter.length;j++){
-				if  ( url_regext.test(split_filter[j] ) && new RegExp('https:\/\/[www\.]*you*').test(split_filter[j])){ //verifica se split_filter[j] é uma url
-					var str =  split_filter[j];
-					video_list_downloader.push(str)
-				}
-			}
-		}*/
 
 		return video_list_downloader
 	}
@@ -56,33 +46,25 @@
 
 	//retorna a lista de pdfs para ser baixado 
 	function getListPDFs(){
-		var pdfs_list = [];
+		
 		var pdf_regex = new RegExp('\.pdf');
 		var estagio_regex = new RegExp("Estagio*");
-
-		pdfs_list =  Array.from ( new Set (filter_span.map(function(post){
+		var pdfs_list =  Array.from ( new Set (filter_span.map(function(post){
 			return post.postContent
-		}).reduce((posts,atualPost) => posts + atualPost).split(' ') ) ).filter(function(str){
+		}).reduce((posts,atualPost) => posts  + atualPost).split(' ') ) )
+		.filter(function(str){
+			console.log(str)
 			return pdf_regex.test(str)
 		})
-
-		/*for ( var i = 0; i < filter_span.length;i++){
-			var split_filter = filter_span[i].postContent.split(' ')
-			
-			for ( var j = 0; j < split_filter.length;j++){
-				if ( pdf_regex.test(split_filter[j]) && ( estagio_regex.test(split_filter[j])  == true ) ){ //verifica se  split_filter[j] tem a expressão regular do \.pdf
-					pdfs_list.push(split_filter[j])
-				}
-			}
-		}
-		*/
 
 		return  pdfs_list
 
 
 	}
 
-	function getTagA(myElement){
+	/*
+		*@param myElement
+	*/	function getTagA(myElement){
 		if( myElement != null &&  myElement.tagName != 'A' ){
 			return getTagA(myElement.parentElement)
 		}else{
@@ -103,13 +85,13 @@
 		})
 	}
 
-	function main(){
-		getFilterSpan()
-		getUrlPost()
-		my_v =    Array.from ( new Set (getListVideos() )).reverse()
-		my_pdfs = Array.from ( new Set(getListPDFs())).reverse()
-		obj = [ my_v,my_pdfs]
-		copy(obj)
-	}
+function main(){
+	getFilterSpan()
+	getUrlPost()
+	my_v =    Array.from ( new Set (getListVideos() )).reverse()
+	my_pdfs = getListPDFs().reverse()
+	obj = [ my_v,my_pdfs]
+	copy(obj)
+}
 
-	main()	
+main()	
