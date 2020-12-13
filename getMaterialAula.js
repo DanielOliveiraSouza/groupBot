@@ -131,7 +131,7 @@ var videos_list = [
     "Atividades_complementares_Estagio_I_0510_a_0910.pdf"
   ]
 
-
+  
 //função para remover todos os caracteres não permitidos em nomes de arquivos
 //obs: essa função  foi criado,pois o node.js v12 não possui o metodo String.prototype.replaceAll (ECMA2021)
 function replaceSpecialChars(str){
@@ -141,7 +141,6 @@ function replaceSpecialChars(str){
 		ret = emojiStrip( ret).replace(',','').replace(' ','_').replace('/\//g','').replace('/\s/g','').replace('/\//g','')
 		.replace('"','').replace('.','').replace('/','').replace('?','').replace('!','').replace('(','').replace(')','')
 		.replace(':','').replace('|','').replace("#",'').replace('__','').replace('--','').replace('_-_','')
-		//console.log(title)
 		count++;
 	}
 	return ret
@@ -228,10 +227,9 @@ async function downloadTitle(url,i){
 //função para baixar todos os vídeos 
 async function getAllTitles(){
 
-	for ( var i = 0 ;i < videos_list.length; i++) {
-		var url = videos_list[i]
-		await downloadTitle(url,i)
-	}
+	videos_list.map(function(url){
+		await downloadTitle(url)
+	})
 }
 
 
